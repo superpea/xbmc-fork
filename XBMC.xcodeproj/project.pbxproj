@@ -6821,19 +6821,20 @@
 				GENERATE_PROFILING_CODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"xbmc/lib/libffmpeg-OSX",
+					"xbmc/lib/libcdio-osx",
 					xbmc/utils/,
 					xbmc/lib/,
 					/Library/Frameworks/Python.framework/Versions/2.4/Headers/,
 					xbmc/lib/libportaudio,
+					xbmc/lib/libpcre,
 					xbmc/cores,
 					xbmc/cores/dvdplayer,
-					xbmc/cores/ffmpeg,
 					xbmc,
 					xbmc/linux,
 					guilib,
 					/opt/local/include,
 					/opt/local/include/freetype2/,
-					"/opt/local/include/mysql5-devel",
+					/opt/local/include/mysql5/,
 					/usr/X11R6/include/,
 				);
 				INSTALL_PATH = /usr/local/bin;
@@ -6893,19 +6894,20 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
 					"xbmc/lib/libffmpeg-OSX",
+					"xbmc/lib/libcdio-osx",
 					xbmc/utils/,
 					xbmc/lib/,
 					/Library/Frameworks/Python.framework/Versions/2.4/Headers/,
 					xbmc/lib/libportaudio,
+					xbmc/lib/libpcre,
 					xbmc/cores,
 					xbmc/cores/dvdplayer,
-					xbmc/cores/ffmpeg,
 					xbmc,
 					xbmc/linux,
 					guilib,
 					/opt/local/include,
 					/opt/local/include/freetype2/,
-					"/opt/local/include/mysql5-devel",
+					/opt/local/include/mysql5/,
 					/usr/X11R6/include/,
 				);
 				INSTALL_PATH = /usr/local/bin;
@@ -6961,17 +6963,21 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
+					"xbmc/lib/libffmpeg-OSX",
 					"xbmc/lib/libcdio-osx",
-					xbmc/lib/libpcre,
+					xbmc/utils/,
+					xbmc/lib/,
+					/Library/Frameworks/Python.framework/Versions/2.4/Headers/,
 					xbmc/lib/libportaudio,
+					xbmc/lib/libpcre,
 					xbmc/cores,
-					xbmc/cores/ffmpeg,
 					xbmc/cores/dvdplayer,
 					xbmc,
 					xbmc/linux,
 					guilib,
 					/opt/local/include,
 					/opt/local/include/freetype2/,
+					/opt/local/include/mysql5/,
 					/usr/X11R6/include/,
 				);
 				LIBRARY_SEARCH_PATHS = "";
@@ -6996,17 +7002,21 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
+					"xbmc/lib/libffmpeg-OSX",
 					"xbmc/lib/libcdio-osx",
-					"xbmc/lib/libSDL-OSX",
+					xbmc/utils/,
+					xbmc/lib/,
+					/Library/Frameworks/Python.framework/Versions/2.4/Headers/,
 					xbmc/lib/libportaudio,
+					xbmc/lib/libpcre,
 					xbmc/cores,
-					xbmc/cores/ffmpeg,
 					xbmc/cores/dvdplayer,
 					xbmc,
 					xbmc/linux,
 					guilib,
 					/opt/local/include,
 					/opt/local/include/freetype2/,
+					/opt/local/include/mysql5/,
 					/usr/X11R6/include/,
 				);
 				LIBRARY_SEARCH_PATHS = "xbmc/lib/libSDL-OSX";
