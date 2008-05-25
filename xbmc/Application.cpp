@@ -1021,8 +1021,10 @@ HRESULT CApplication::Create(HWND hWnd)
   sdlFlags |= SDL_INIT_AUDIO;
 #endif
 
+#ifndef __APPLE__
 #ifdef HAS_SDL_JOYSTICK
   sdlFlags |= SDL_INIT_JOYSTICK;
+#endif
 #endif
 
 
