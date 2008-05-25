@@ -1,0 +1,3 @@
+build/
+XBMC.xcodeproj/*.mode1v3
+XBMC.xcodeproj/*.pbxuser
