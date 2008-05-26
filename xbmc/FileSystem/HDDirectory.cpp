@@ -19,7 +19,9 @@
  *
  */
 
-
+#ifdef __APPLE__
+#include <CoreServices/CoreServices.h>
+#endif
 #include "stdafx.h"
 #include "HDDirectory.h"
 #include "Util.h"
@@ -97,6 +99,52 @@ bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items
     {
       if (wfd.cFileName[0] != 0)
       {
+#ifdef __APPLE__
+        // Attempt to resolve aliases.
+        FSRef   fsRef;
+        Boolean isDir;
+        Boolean isAlias;
+        char    resolvedAliasPath[MAX_PATH];
+        bool    useAlias = false;
+                    
+        // Convert to FSRef.
+        CStdString strFile = strRoot + wfd.cFileName;
+        if (FSPathMakeRef((const UInt8* )strFile.c_str(), &fsRef, &isDir) == noErr)
+        {
+          if (FSResolveAliasFileWithMountFlags(&fsRef, TRUE, &isDir, &isAlias, kResolveAliasFileNoUI) == noErr)
+          {
+            // If it was an alias, use the reference instead.
+            if (isAlias)
+            {
+              if (FSRefMakePath(&fsRef, (UInt8* )resolvedAliasPath, MAX_PATH) == noErr)
+                useAlias = true;
+            }
+          }
+        }
+        
+        if (useAlias)
+        {
+          // Add the alias.
+          CFileItem *pItem = new CFileItem(wfd.cFileName);
+          pItem->m_strPath = resolvedAliasPath;
+          pItem->m_bIsFolder = isDir ? true : false;
+          
+          if (isDir == false)
+          {
+            // Get the size of the file.
+            struct stat64 statInfo;
+            stat64(resolvedAliasPath, &statInfo);
+            pItem->m_dwSize = statInfo.st_size;
+          }
+          
+          FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
+          pItem->m_dateTime=localTime;
+          
+          vecCacheItems.Add(pItem);
+          items.Add(new CFileItem(*pItem));
+        }
+        else
+#endif
         if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
         {
           CStdString strDir = wfd.cFileName;
@@ -110,6 +158,7 @@ bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items
             CFileItem *pItem = new CFileItem(strLabel);
             pItem->m_strPath = strRoot;
             pItem->m_strPath += wfd.cFileName;
+
 #ifndef _LINUX
             g_charsetConverter.stringCharsetToUtf8(pItem->m_strPath);
 #endif
