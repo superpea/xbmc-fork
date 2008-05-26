@@ -119,19 +119,25 @@ HANDLE FindFirstFile(LPCSTR szPath,LPWIN32_FIND_DATA lpFindData) {
   return pHandle;
 }
 
-BOOL   FindNextFile(HANDLE hHandle, LPWIN32_FIND_DATA lpFindData) {
+BOOL FindNextFile(HANDLE hHandle, LPWIN32_FIND_DATA lpFindData) 
+{
   if (lpFindData == NULL || hHandle == NULL || hHandle->GetType() != CXHandle::HND_FIND_FILE)
     return FALSE;
 
-  if ((unsigned int) hHandle->m_nFindFileIterator >= hHandle->m_FindFileResults.size())
-    return FALSE;
-
-  CStdString strFileName = hHandle->m_FindFileResults[hHandle->m_nFindFileIterator++];
-        CStdString strFileNameTest = hHandle->m_FindFileDir + '/' + strFileName;
+  CStdString strFileName;
+  CStdString strFileNameTest;
 
   struct stat64 fileStat;
-  if (stat64(strFileNameTest, &fileStat) != 0)
-    return FALSE;
+  do
+  {
+    if ((unsigned int) hHandle->m_nFindFileIterator >= hHandle->m_FindFileResults.size())
+        return FALSE;
+    
+    strFileName = hHandle->m_FindFileResults[hHandle->m_nFindFileIterator++];
+    strFileNameTest = hHandle->m_FindFileDir + '/' + strFileName;
+    
+    // Keep doing this until we actually have a file that exists.
+  } while (stat64(strFileNameTest, &fileStat) != 0);
 
   bool bIsDir = false;
   DIR *testDir = opendir(strFileNameTest);
