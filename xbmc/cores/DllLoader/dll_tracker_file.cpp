@@ -36,7 +36,7 @@
 #include <io.h>
 #endif
 
-extern "C" void tracker_file_track(uintptr_t caller, unsigned handle, TrackedFileType type, const char* sFile)
+extern "C" void tracker_file_track(uintptr_t caller, uintptr_t handle, TrackedFileType type, const char* sFile)
 {
   DllTrackInfo* pInfo = tracker_get_dlltrackinfo(caller);
   if (pInfo)
@@ -49,7 +49,7 @@ extern "C" void tracker_file_track(uintptr_t caller, unsigned handle, TrackedFil
   }
 }
 
-extern "C" void tracker_file_free(uintptr_t caller, unsigned handle, TrackedFileType type)
+extern "C" void tracker_file_free(uintptr_t caller, uintptr_t handle, TrackedFileType type)
 {
   DllTrackInfo* pInfo = tracker_get_dlltrackinfo(caller);
   if (pInfo)
@@ -135,7 +135,8 @@ extern "C"
     
     tracker_file_free(loc, (uintptr_t)stream, FILE_XBMC_FOPEN);
     stream = dll_freopen(path, mode, stream);
-    if (stream) tracker_file_track(loc, (uintptr_t)stream, FILE_XBMC_FOPEN, path);
+    if (stream)
+      tracker_file_track(loc, (uintptr_t)stream, FILE_XBMC_FOPEN, path);
     return stream;
   }
 

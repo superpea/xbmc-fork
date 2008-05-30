@@ -86,13 +86,13 @@ stDriveMapping driveMapping[] =
 #else
 stDriveMapping driveMapping[] =
   {
-     {'P', new char[MAX_PATH], 0},
-     {'Q', new char[MAX_PATH], 0},
-     {'T', new char[MAX_PATH], 0},
-     {'Z', new char[MAX_PATH], 0},
-     {'C', new char[MAX_PATH], 0},
-     {'E', new char[MAX_PATH], 0},
-     {'U', new char[MAX_PATH], 0}
+    {'P', new char[MAX_PATH], 0},
+    {'Q', new char[MAX_PATH], 0},
+    {'T', new char[MAX_PATH], 0},
+    {'Z', new char[MAX_PATH], 0},
+    {'C', new char[MAX_PATH], 0},
+    {'E', new char[MAX_PATH], 0},
+    {'U', new char[MAX_PATH], 0}
   };
 #endif
 
@@ -262,7 +262,7 @@ HRESULT CIoSupport::EjectTray()
 #endif
 #ifdef __APPLE__
   char* dvdDevice = CCdIoSupport::GetDeviceFileName();
-  CdIo_t* cdio = cdio_open(dvdDevice, DRIVER_UNKNOWN);
+  CdIo_t* cdio = cdio_open(dvdDevice, DRIVER_OSX);
   if (cdio)
   {
     cdio_eject_media(&cdio);
@@ -458,8 +458,6 @@ INT CIoSupport::ReadSectorMode2(HANDLE hDevice, DWORD dwSector, LPSTR lpczBuffer
 {
 #ifdef HAS_DVD_DRIVE
 #ifdef __APPLE__
-  // FIXME.
-#elif defined(_WIN32PC)
   // FIXME.
 #elif defined(_LINUX)
   if (hDevice->m_bCDROM)

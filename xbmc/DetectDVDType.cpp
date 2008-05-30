@@ -86,18 +86,21 @@ void CDetectDVDMedia::Process()
     m_DriveState = DRIVE_CLOSED_MEDIA_PRESENT;
   }
 
+// for apple - currently disable this check since cdio will return null if no media is loaded
+#ifndef __APPLE__
   //Before entering loop make sure we actually have a CDrom drive
   CdIo_t *p_cdio = cdio_open (NULL, DRIVER_DEVICE);
   if (p_cdio == NULL)
     return;
   else
     cdio_destroy(p_cdio);
+#endif
 
   while (( !m_bStop ) && (!g_advancedSettings.m_usePCDVDROM))
   {
     UpdateDvdrom();
     m_bStartup = false;
-    Sleep(500);
+    Sleep(1000);
     if ( m_bAutorun )
     {
       Sleep(1500); // Media in drive, wait 1.5s more to be sure the device is ready for playback
@@ -125,7 +128,7 @@ VOID CDetectDVDMedia::UpdateDvdrom()
         {
           // Send Message to GUI that disc been ejected
 #ifdef _WIN32PC
-          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName(), false, g_localizeStrings.Get(502));
+          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName()+4, false, g_localizeStrings.Get(502));
 #else
           SetNewDVDShareUrl("D:\\", false, g_localizeStrings.Get(502));
           m_isoReader.Reset();
@@ -142,7 +145,7 @@ VOID CDetectDVDMedia::UpdateDvdrom()
         {
           // drive is not ready (closing, opening)
 #ifdef _WIN32PC
-          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName(), false, g_localizeStrings.Get(503));
+          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName()+4, false, g_localizeStrings.Get(503));
 #else
           m_isoReader.Reset();
           SetNewDVDShareUrl("D:\\", false, g_localizeStrings.Get(503));
@@ -173,7 +176,7 @@ VOID CDetectDVDMedia::UpdateDvdrom()
         {
           // nothing in there...
 #ifdef _WIN32PC
-          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName(), false, g_localizeStrings.Get(504));
+          SetNewDVDShareUrl(CCdIoSupport::GetDeviceFileName()+4, false, g_localizeStrings.Get(504));
 #else
           m_isoReader.Reset();
           SetNewDVDShareUrl("D:\\", false, g_localizeStrings.Get(504));
@@ -242,16 +245,14 @@ void CDetectDVDMedia::DetectMediaType()
             m_pCdInfo->GetAudioTrackCount(),
             m_pCdInfo->GetDataTrackCount() );
 
-#if defined(_WIN32) && !defined(HAS_XBOX_HARDWARE)
-  // Detect ISO9660(mode1/mode2), CDDA filesystem or UDF
-  if (m_pCdInfo->IsAudio(1))
+#ifdef _WIN32PC
+  if(m_pCdInfo->IsAudio(1))
   {
     strNewUrl = "cdda://local/";
     bCDDA = true;
   }
   else
     strNewUrl = CCdIoSupport::GetDeviceFileName()+4;
-
 #else
   // Detect ISO9660(mode1/mode2), CDDA filesystem or UDF
   if (m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660(1) || m_pCdInfo->IsIso9660Interactive(1))
@@ -455,13 +456,8 @@ DWORD CDetectDVDMedia::GetTrayState()
   CdIo_t* cdio = cdio_open(dvdDevice, DRIVER_UNKNOWN);
   if (cdio)
   {
-    static discmode_t discmode = CDIO_DISC_MODE_NO_INFO;
-    int status = CWIN32Util::GetDriveStatus(CCdIoSupport::GetDeviceFileName());//mmc_get_tray_status(cdio);
-    
+    int status = CWIN32Util::GetDriveStatus(CCdIoSupport::GetDeviceFileName()); 
     static int laststatus = -1;
-    // We only poll for new discmode when status has changed or there have been read errors (The last usually happens when new media is inserted)
-    //if (status == 0 && (laststatus != status || discmode == CDIO_DISC_MODE_ERROR))
-      discmode = cdio_get_discmode(cdio);
 
     switch(status)
     {

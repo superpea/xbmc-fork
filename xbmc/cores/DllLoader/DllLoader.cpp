@@ -298,7 +298,8 @@ int DllLoader::Parse()
     if (CoffLoader::ParseCoff(fp))
     {
       if(WindowsHeader)
-        tracker_dll_set_addr(this, (uintptr_t)hModule, (uintptr_t)hModule + WindowsHeader->SizeOfImage - 1);
+        tracker_dll_set_addr(this, (uintptr_t)hModule,
+          (uintptr_t)hModule + WindowsHeader->SizeOfImage - 1);
       else
       {
         uintptr_t iMinAddr = std::numeric_limits<uintptr_t>::max();
@@ -306,8 +307,11 @@ int DllLoader::Parse()
         // dll is loaded now, this means we also know the base address of it and its size
         for (int i = 0; i < NumOfSections; ++i)
         {
-          iMinAddr = std::min(iMinAddr, (uintptr_t)SectionHeader[i].VirtualAddress);
-          iMaxAddr = std::max(iMaxAddr, (uintptr_t)(SectionHeader[i].VirtualAddress+SectionHeader[i].VirtualSize));
+          iMinAddr = std::min<uintptr_t>(iMinAddr,
+                       (uintptr_t)SectionHeader[i].VirtualAddress);
+          iMaxAddr = std::max<uintptr_t>(iMaxAddr,
+                       (uintptr_t)(SectionHeader[i].VirtualAddress +
+                                   SectionHeader[i].VirtualSize));
         }
         if(iMaxAddr > iMinAddr)
         {

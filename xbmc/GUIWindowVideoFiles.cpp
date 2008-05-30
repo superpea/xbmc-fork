@@ -660,7 +660,7 @@ void CGUIWindowVideoFiles::GetContextButtons(int itemNumber, CContextButtons &bu
           m_database.Open();
           if (!item->IsParentFolder())
           {
-            if (m_database.GetMovieInfo(item->m_strPath)<0 && m_database.GetEpisodeInfo(item->m_strPath)<0)
+            if (!m_database.HasMovieInfo(item->m_strPath) && !m_database.HasEpisodeInfo(item->m_strPath))
               buttons.Add(CONTEXT_BUTTON_ADD_TO_LIBRARY, 527); // Add to Database
           }
           m_database.Close();
@@ -721,7 +721,7 @@ bool CGUIWindowVideoFiles::OnContextButton(int itemNumber, CONTEXT_BUTTON button
       else
         m_database.GetScraperForPath(item->m_strPath, info, settings);
       CScraperParser parser;
-      if (parser.Load("q:\\system\\scrapers\\video\\"+info.strPath))
+      if (parser.Load(_P("q:\\system\\scrapers\\video\\"+info.strPath)))
         info.strTitle = parser.GetName();
       OnAssignContent(itemNumber,0, info, settings);
       return true;
