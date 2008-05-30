@@ -3023,6 +3023,18 @@ void CApplication::Render()
 {
   if (!m_AppActive && !m_bStop) {Sleep(1); return;}
 
+#ifdef __APPLE__
+  // Make sure the system mouse cursor is hidden. I'm not sure if this 
+  // is a question of needing to call it once a bit later than we do
+  // (see http://lists.apple.com/archives/Mac-opengl/2006/Nov/msg00005.html)
+  // or a question of something making the cursor appear at a later time.
+  // Either way, this should fix it!
+  //
+  static int frameCount = 0;
+  if (frameCount++ % 10 == 0 && g_advancedSettings.m_fullScreen)
+    Cocoa_HideMouse();
+#endif
+  
   MEASURE_FUNCTION;
 
   { // frame rate limiter (really bad, but it does the trick :p)

@@ -406,3 +406,8 @@ int Cocoa_SleepSystem()
 
   return 0;
 }        
+
+void Cocoa_HideMouse()
+{
+  [NSCursor hide];
+}

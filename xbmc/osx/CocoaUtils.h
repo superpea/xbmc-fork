@@ -60,6 +60,11 @@ extern "C"
   int Cocoa_DimDisplayNow();      
   void Cocoa_UpdateSystemActivity();
   int Cocoa_SleepSystem();
+  
+  //
+  // Mouse.
+  //
+  void Cocoa_HideMouse();
 
 #ifdef __cplusplus
 }
