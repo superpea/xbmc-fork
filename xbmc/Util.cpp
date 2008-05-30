@@ -5801,31 +5801,21 @@ void CUtil::BootToDash()
 CStdString CUtil::TranslatePath(const CStdString& path)
 {
   CStdString result;
-
+  
   if (path.length() > 0 && path[1] == ':')
   {
 #ifdef __APPLE__
     CStdString lowerPath = path;
     lowerPath.ToLower();
     
-    // Special mappings for OS X.
+    // Special mappings for OS X. We could change all the q:\\plugins to
+    // look in T instead, but I'm not entirely sure that's correct.
+    //
     if (path[0] == 'Q' || path[0] == 'q')
     {
-      if (path.Equals("q:\\system\\profiles.xml", false))
+      if (lowerPath.Find("q:\\plugins") == 0)
       {
-        CStdString str = getenv("HOME");  
-        str.append("/Library/Application Support/XBMC/profiles.xml");
-        return str;
-      }
-      else if (path.Equals("q:\\system\\mediasources.xml", false))
-      {
-        CStdString str = getenv("HOME");  
-        str.append("/Library/Application Support/XBMC/mediasources.xml");
-        return str;
-      }
-      else if (lowerPath.Find("q:\\plugins") == 0)
-      {
-        CStdString str = getenv("HOME");  
+        CStdString str = getenv("HOME");
         str.append("/Library/Application Support/XBMC/Plugins");
         str.append(path.substr(10));
         str.Replace('\\', '/');

@@ -33,7 +33,7 @@ using namespace std;
 #ifdef _XBOX
 const char MEDIA_SOURCES_XML[] = { "Q:\\system\\mediasources.xml" };
 #else
-const char MEDIA_SOURCES_XML[] = { "P:\\mediasources.xml" };
+const char MEDIA_SOURCES_XML[] = { "T:\\mediasources.xml" };
 #endif
 
 class CMediaManager g_mediaManager;
