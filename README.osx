@@ -30,8 +30,7 @@ command.
 2. Getting the source code
 -----------------------------------------------------------------------------
 
-   $ cd $HOME
-   $ svn checkout https://xbmc.svn.sourceforge.net/svnroot/xbmc/branches/linuxport/XBMC
+TBD.
 
 -----------------------------------------------------------------------------
 3. Installing the required MacPorts packages
@@ -42,12 +41,6 @@ packages from the Terminal window:
 
 	$ sudo port install glew freetype fribidi libcdio lzo python24 libsdl libsdl_image 
 	$ sudo port install libsdl_mixer mysql5-devel pcre samba3 fontconfig libmad
-
------------------------------------------------------------------------------
-3.1 Fix two MacPorts package default install locations with sym links
------------------------------------------------------------------------------
-	$ sudo ln -s /opt/local/include/mysql5/mysql/ /opt/local/include/mysql
-	$ sudo ln -s /opt/local/Library/Frameworks/Python.framework/Versions/2.4/include/python2.4 /opt/local/include/python2.4
 
 -----------------------------------------------------------------------------
 4. How to compile
