@@ -159,8 +159,13 @@ VOID CDetectDVDMedia::UpdateDvdrom()
             m_pCdInfo = NULL;
           }
           waitLock.Leave();
-          CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_SOURCES);
-          m_gWindowManager.SendThreadMessage( msg );
+
+          // Sending this message every second is bad news, causing pulsing library
+          // icons and crashes.
+          //
+          //CGUIMessage msg(GUI_MSG_NOTIFY_ALL, 0, 0, GUI_MSG_UPDATE_SOURCES);
+          //m_gWindowManager.SendThreadMessage( msg );
+          
           // Do we really need sleep here? This will fix: [ 1530771 ] "Open tray" problem
           // Sleep(6000);
           return ;
