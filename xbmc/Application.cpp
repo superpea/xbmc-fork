@@ -891,7 +891,13 @@ HRESULT CApplication::Create(HWND hWnd)
 #ifdef _LINUX
   if (m_bPlatformDirectories)
   {
+#ifdef __APPLE__
+    CStdString logDir = getenv("HOME");
+    logDir.append("/Library/Logs/");
+    g_stSettings.m_logFolder = logDir;
+#else
     g_stSettings.m_logFolder = "/var/tmp/";
+#endif
   }
   else
   {
