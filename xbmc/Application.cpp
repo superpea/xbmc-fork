@@ -1621,9 +1621,6 @@ CProfile* CApplication::InitDirectoriesOSX()
   CStdString home = getenv("HOME");
   CIoSupport::RemapDriveLetter('Q', (char*) strExecutablePath.c_str());
 
-  g_settings.m_vecProfiles.clear();
-  g_settings.LoadProfiles(_P(PROFILES_FILE));
-
   CProfile* profile = NULL;
 
   if (m_bPlatformDirectories)
@@ -1650,23 +1647,17 @@ CProfile* CApplication::InitDirectoriesOSX()
     str.append("/Library/Application Support/XBMC");
     CIoSupport::RemapDriveLetter('T', str.c_str());
     CIoSupport::RemapDriveLetter('U', str.c_str());
-    
-    if (g_settings.m_vecProfiles.size()==0)
-    {
-      profile = new CProfile;
-      CStdString s = getenv("HOME");
-      s.append("/Library/Application Support/XBMC/UserData");
-      profile->setDirectory(s.c_str());
-    }
   }
-  else
+
+  g_settings.m_vecProfiles.clear();
+  g_settings.LoadProfiles(_P(PROFILES_FILE));
+
+  if (g_settings.m_vecProfiles.size() == 0)
   {
-    if (g_settings.m_vecProfiles.size()==0)
-    {
-      profile = new CProfile;
-      profile->setDirectory(_P("q:\\UserData"));
-    }
+    profile = new CProfile();
+    profile->setDirectory(_P("t:\\UserData"));
   }
+  
   return profile;
 #else
   return NULL;
