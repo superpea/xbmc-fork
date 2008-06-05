@@ -25,6 +25,7 @@
 // bash# (echo -n "-Wl"; grep __wrap wrapper.c | grep -v bash | sed "s/.*__wrap_//g" | sed "s/(.*//g" | awk '{printf(",-wrap,%s",$0);}') > wrapper.def
 //
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -104,6 +105,11 @@ int __wrap_open(const char *file, int oflag, ...)
 int __wrap_open64(const char *file, int oflag, ...)
 {
   return dll_open(file, oflag);
+}
+
+int __wrap_stat(const char* file, struct stat* buf)
+{
+  return dll_stat(file, buf);
 }
 
 int __wrap_close(int fd)
