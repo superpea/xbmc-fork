@@ -1,7 +1,7 @@
 TOC
 1. Introduction
-2. Getting the source code
-3. Installing the required MacPorts packages
+2. Installing the required MacPorts packages
+3. Getting the source code
 4. How to compile
 	4.1 Using XCode
 	4.2 Using Eclipse
@@ -25,22 +25,21 @@ character are commands that need to be typed into a Terminal window.
 Note that the '$' character itself should NOT be typed as part of the 
 command.
 
-
 -----------------------------------------------------------------------------
-2. Getting the source code
------------------------------------------------------------------------------
-
-   $ cd $HOME
-   $ svn checkout https://xbmc.svn.sourceforge.net/svnroot/xbmc/branches/linuxport/XBMC
-
------------------------------------------------------------------------------
-3. Installing the required MacPorts packages
+2. Installing the required MacPorts packages
 -----------------------------------------------------------------------------
 
 Install MacPorts (http://www.macports.org/). Then install the following
 packages from the Terminal window:
 
-	$ sudo port install glew freetype fribidi libcdio lzo python24 libsdl libsdl_image libsdl_mixer mysql5-devel pcre samba3
+   $ sudo port install gawk git-core +svn glew freetype fribidi libcdio lzo python24 libsdl libsdl_image libsdl_mixer mysql5-devel pcre samba3
+
+-----------------------------------------------------------------------------
+3. Getting the source code
+-----------------------------------------------------------------------------
+
+   $ cd $HOME
+   $ git clone git://github.com/elan/xbmc-fork.git
 
 -----------------------------------------------------------------------------
 4. How to compile
@@ -66,7 +65,7 @@ project and select Build (note that this call out to the xcodebuild tool).
 
 Issue the following command from the top-level directory:
 
-$ xcodebuild -parallelizeTargets -configuration Debug
+   $ xcodebuild -parallelizeTargets -configuration Debug
 
 You can also specify "Release" as a configuration.
 
@@ -75,16 +74,18 @@ You can also specify "Release" as a configuration.
 -----------------------------------------------------------------------------
 
 Set the XBMC_HOME environment variable to point to a runtime environment 
-(a good one is the directory inside XBMC.app, namely 
-XBMC.app/Content/Resources/XBMC).
+(a good one is the directory inside OSXBMC.app, namely 
+OSXBMC.app/Content/Resources/XBMC).
 
+   $ export XBMC_HOME=./build/Debug/OSXBMC.app/Contents/Resources/XBMC
+   
 Then, to run the debug version:
 
-$ build/Debug/XBMC
+   $ ./build/Debug/OSXBMC
 
 And the release version:
 
-$ build/Release/XBMC 
+   $ ./build/Release/OSXBMC 
 
 -----------------------------------------------------------------------------
 6. Tips n' Tricks section
