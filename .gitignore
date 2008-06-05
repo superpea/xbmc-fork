@@ -1,1 +1,4 @@
 build/
+.firstrun
+*.mode1v3
+*.pbxuser
