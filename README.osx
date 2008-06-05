@@ -89,11 +89,11 @@ OSXBMC.app/Content/Resources/XBMC).
    
 Then, to run the debug version:
 
-   $ ./build/Debug/OSXBMC
+   $ ./build/Debug/XBMC
 
 And the release version:
 
-   $ ./build/Release/OSXBMC 
+   $ ./build/Release/XBMC 
 
 -----------------------------------------------------------------------------
 6. Tips n' Tricks section
