@@ -1635,6 +1635,9 @@ CProfile* CApplication::InitDirectoriesOSX()
     CStdString str2 = str;
     str2.append("/Mounts");
     CreateDirectory(str2.c_str(), NULL);
+    str2 = str;
+    str2.append("/skin");
+    CreateDirectory(str2.c_str(), NULL);
     str.append("/UserData");
     CreateDirectory(str.c_str(), NULL);
 
