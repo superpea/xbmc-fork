@@ -128,6 +128,10 @@ CFileItem* CHDDirectory::BuildFileItem(const CStdString& strRoot, WIN32_FIND_DAT
   g_charsetConverter.stringCharsetToUtf8(strLabel);
 #endif
 
+#ifdef __APPLE__
+  strLabel.Replace(':', '/');
+#endif
+  
   CFileItem *pItem = new CFileItem(strLabel);
   pItem->m_strPath = strRoot;
   pItem->m_strPath += wfd.cFileName;
@@ -230,11 +234,12 @@ CFileItem* CHDDirectory::BuildResolvedFileItem(const CStdString& strRoot, WIN32_
   if (CUtil::IsSmartFolder(strFile))
   {
     // Use the original name, without extension.
-    CStdString smartFolder = wfd.cFileName;
+    CStdString smartFolder = strFile;
     int iPos = smartFolder.ReverseFind(".");
     if (iPos > 0)
       smartFolder = smartFolder.Left(iPos);
     
+    strFile.Replace(':', '/');
     pItem = new CFileItem(smartFolder);
     pItem->m_strPath = "smartfolder:/" + strPath + strFile;
     pItem->m_bIsFolder = true;
@@ -242,7 +247,8 @@ CFileItem* CHDDirectory::BuildResolvedFileItem(const CStdString& strRoot, WIN32_
   else if (useAlias)
   {
     // Add the alias.
-    pItem = new CFileItem(wfd.cFileName);
+    strFile.Replace(':', '/');
+    pItem = new CFileItem(strFile);
     pItem->m_strPath = resolvedAliasPath;
     pItem->m_bIsFolder = isDir ? true : false;
     

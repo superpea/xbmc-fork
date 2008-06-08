@@ -398,7 +398,7 @@ void CIMDB::GetURL(const CStdString &strMovie, CScraperUrl& scrURL, CStdString& 
   {
     CStdString strSearch1, strSearch2;
     strSearch1 = strMovie;
-    strSearch1.ToLower();
+    //strSearch1.ToLower();
 
     CRegExp reYear;
     reYear.RegComp("(.+[^"SEP"])["SEP"]+(19[0-9][0-9]|20[0-1][0-9])(["SEP"]|$)");
