@@ -57,7 +57,8 @@ CDVDPlayerVideo::CDVDPlayerVideo(CDVDClock* pClock, CDVDOverlayContainer* pOverl
   m_fForcedAspectRatio = 0;
   m_iNrOfPicturesNotToSkip = 0;
   InitializeCriticalSection(&m_critCodecSection);
-  m_messageQueue.SetMaxDataSize(20 * 256 * 1024); 
+  m_messageQueue.SetMaxDataSize(CDVDPlayer::GetCacheSize() * 1024); // 20 * 256 * 1024 
+  printf("Setting video cache size to %dKB\n", CDVDPlayer::GetCacheSize());
   g_dvdPerformanceCounter.EnableVideoQueue(&m_messageQueue);
   
   m_iCurrentPts = DVD_NOPTS_VALUE;

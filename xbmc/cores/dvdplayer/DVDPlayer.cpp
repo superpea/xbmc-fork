@@ -3011,3 +3011,74 @@ bool CDVDPlayer::ExtractThumb(const CStdString &strPath, const CStdString &strTa
   return bOk;
 }
 
+int CDVDPlayer::GetCacheSize()
+{
+  CFileItem file = g_application.CurrentFileItem();
+  CStdString strFile = file.m_strPath;
+  printf("Computing cache size for [%s].\n", strFile.c_str());
+
+  // First, figure out the source of the file.
+  bool bFileOnHD = false;
+  bool bFileOnISO = false;
+  bool bFileOnUDF = false;
+  bool bFileOnInternet = false;
+  bool bFileOnLAN = false;
+  bool bFileIsDVDImage = false;
+  bool bFileIsDVDIfoFile = false;
+
+  CURL url(strFile);
+  if (file.IsHD()) bFileOnHD = true;
+  else if (file.IsISO9660()) bFileOnISO = true;
+  else if (file.IsOnDVD()) bFileOnUDF = true;
+  else if (file.IsOnLAN()) bFileOnLAN = true;
+  else if (file.IsInternetStream()) bFileOnInternet = true;  
+
+  bool bIsVideo = file.IsVideo();
+  bool bIsAudio = file.IsAudio();
+  bool bIsDVD = false;
+
+  bFileIsDVDImage = file.IsDVDImage();
+  bFileIsDVDIfoFile = file.IsDVDFile(false, true);
+
+  CLog::Log(LOGDEBUG,"file:%s IsDVDImage:%i IsDVDIfoFile:%i", strFile.c_str(), bFileIsDVDImage , bFileIsDVDIfoFile);
+  if (strFile.Find("dvd://") >= 0 || bFileIsDVDImage || bFileIsDVDIfoFile)
+  {
+    bIsDVD = true;
+    bIsVideo = true;
+  }
+
+  if (g_stSettings.m_currentVideoSettings.m_NoCache) return 0;
+
+  if (bFileOnHD)
+  {
+    if ( bIsDVD ) return g_guiSettings.GetInt("cache.harddisk");
+    if ( bIsVideo) return g_guiSettings.GetInt("cache.harddisk");
+    if ( bIsAudio) return g_guiSettings.GetInt("cache.harddisk");
+  }
+  
+  if (bFileOnISO || bFileOnUDF)
+  {
+    if ( bIsDVD ) return g_guiSettings.GetInt("cachedvd.dvdrom");
+    if ( bIsVideo) return g_guiSettings.GetInt("cachevideo.dvdrom");
+    if ( bIsAudio) return g_guiSettings.GetInt("cacheaudio.dvdrom");
+  }
+  
+  if (bFileOnInternet)
+  {
+    if ( bIsVideo) return g_guiSettings.GetInt("cachevideo.internet");
+    if ( bIsAudio) return g_guiSettings.GetInt("cacheaudio.internet");
+    //File is on internet however we don't know what type.
+    return g_guiSettings.GetInt("cacheunknown.internet");
+    //Apparently fixes DreamBox playback.
+    //return 4096;
+  }
+  
+  if (bFileOnLAN)
+  {
+    if ( bIsDVD ) return g_guiSettings.GetInt("cachedvd.lan");
+    if ( bIsVideo) return g_guiSettings.GetInt("cachevideo.lan");
+    if ( bIsAudio) return g_guiSettings.GetInt("cacheaudio.lan");
+  }
+  
+  return 1024;
+}
