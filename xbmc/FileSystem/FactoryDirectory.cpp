@@ -33,6 +33,7 @@
 #include "ShoutcastDirectory.h"
 #include "LastFMDirectory.h"
 #include "FTPDirectory.h"
+#include "SmartFolderDirectory.h"
 #include "Application.h"
 
 #ifdef HAS_FILESYSTEM_SMB
@@ -147,6 +148,9 @@ IDirectory* CFactoryDirectory::Create(const CStdString& strPath)
     if (strProtocol == "hdhomerun") return new CDirectoryHomeRun();
     if (strProtocol == "myth") return new CCMythDirectory();
     if (strProtocol == "cmyth") return new CCMythDirectory();
+#ifdef __APPLE__
+    if (strProtocol == "smartfolder") return new CSmartFolderDirectory();
+#endif
   }
 
  return NULL;

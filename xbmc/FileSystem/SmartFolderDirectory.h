@@ -20,26 +20,18 @@
  *
  */
 
-
-#include "IDirectory.h"
-struct WIN32_FILE_DATA;
-class CFileItem;
+#include "stdafx.h"
+#include "HDDirectory.h"
 
 namespace DIRECTORY
 {
 
-class CHDDirectory : public IDirectory
+class CSmartFolderDirectory : public CHDDirectory
 {
 public:
-  CHDDirectory(void);
-  virtual ~CHDDirectory(void);
+  CSmartFolderDirectory() {}
+  virtual ~CSmartFolderDirectory() {}
   virtual bool GetDirectory(const CStdString& strPath, CFileItemList &items);
-  virtual bool Create(const char* strPath);
-  virtual bool Exists(const char* strPath);
-  virtual bool Remove(const char* strPath);
-protected:
-  bool       IsAllowed(CFileItem* pItem, WIN32_FIND_DATA& wfd);
-  CFileItem* BuildFileItem(const CStdString& strRoot, WIN32_FIND_DATA& wfd);
-  CFileItem* BuildResolvedFileItem(const CStdString& strRoot, WIN32_FIND_DATA& wfd);
+  static void HandleSearchResult(void* thisPtr, void* itemListPtr, const char* strPath);
 };
 }

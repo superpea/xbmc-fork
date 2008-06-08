@@ -39,16 +39,17 @@
 using namespace AUTOPTR;
 using namespace DIRECTORY;
 
-CHDDirectory::CHDDirectory(void)
+CHDDirectory::CHDDirectory()
 {}
 
-CHDDirectory::~CHDDirectory(void)
+CHDDirectory::~CHDDirectory()
 {}
 
+/////////////////////////////////////////////////////////////////////////////
 bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items)
 {
   WIN32_FIND_DATA wfd;
-
+  
   CStdString strPath=strPath1;
 #ifndef _LINUX
   g_charsetConverter.utf8ToStringCharset(strPath);
@@ -56,7 +57,6 @@ bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items
 
   CFileItemList vecCacheItems;
   g_directoryCache.ClearDirectory(strPath1);
-
 
   CStdString strRoot = strPath;
   CURL url(strPath);
@@ -86,137 +86,187 @@ bool CHDDirectory::GetDirectory(const CStdString& strPath1, CFileItemList &items
   strSearchMask += "*";
 #endif
 
-  FILETIME localTime;
-  CAutoPtrFind hFind ( FindFirstFile(strSearchMask.c_str(), &wfd));
+  CAutoPtrFind hFind(FindFirstFile(strSearchMask.c_str(), &wfd));
   
-  // on error, check if path exists at all, this will return true if empty folder
-  if (!hFind.isValid()) 
+  // On error, check if path exists at all, this will return true if empty folder.
+  if (hFind.isValid() == false) 
       return Exists(strPath1);
 
-  if (hFind.isValid())
+  do
   {
-    do
+    if (wfd.cFileName[0] != 0)
     {
-      if (wfd.cFileName[0] != 0)
+      CFileItem* pItem = BuildResolvedFileItem(strRoot, wfd);
+      if (pItem)
       {
-#ifdef __APPLE__
-        // Attempt to resolve aliases.
-        FSRef   fsRef;
-        Boolean isDir;
-        Boolean isAlias;
-        char    resolvedAliasPath[MAX_PATH];
-        bool    useAlias = false;
-                    
-        // Convert to FSRef.
-        CStdString strFile = strRoot + wfd.cFileName;
-        if (FSPathMakeRef((const UInt8* )strFile.c_str(), &fsRef, &isDir) == noErr)
-        {
-          if (FSResolveAliasFileWithMountFlags(&fsRef, TRUE, &isDir, &isAlias, kResolveAliasFileNoUI) == noErr)
-          {
-            // If it was an alias, use the reference instead.
-            if (isAlias)
-            {
-              if (FSRefMakePath(&fsRef, (UInt8* )resolvedAliasPath, MAX_PATH) == noErr)
-                useAlias = true;
-            }
-          }
-        }
-        
-        if (useAlias)
-        {
-          // Add the alias.
-          CFileItem *pItem = new CFileItem(wfd.cFileName);
-          pItem->m_strPath = resolvedAliasPath;
-          pItem->m_bIsFolder = isDir ? true : false;
-          
-          if (isDir == false)
-          {
-            // Get the size of the file.
-            struct stat64 statInfo;
-            stat64(resolvedAliasPath, &statInfo);
-            pItem->m_dwSize = statInfo.st_size;
-          }
-          
-          FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
-          pItem->m_dateTime=localTime;
-          
-          vecCacheItems.Add(pItem);
+        // Always add to the cache.
+        vecCacheItems.Add(pItem);
+      
+        // If it's allowed, add it to the list.
+        if (IsAllowed(pItem, wfd))
           items.Add(new CFileItem(*pItem));
-        }
-        else
-#endif
-        if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-        {
-          CStdString strDir = wfd.cFileName;
-          if (strDir != "." && strDir != "..")
-          {
-            CStdString strLabel=wfd.cFileName;
-#ifndef _LINUX
-            g_charsetConverter.stringCharsetToUtf8(strLabel);
-#endif
-
-            CFileItem *pItem = new CFileItem(strLabel);
-            pItem->m_strPath = strRoot;
-            pItem->m_strPath += wfd.cFileName;
-
-#ifndef _LINUX
-            g_charsetConverter.stringCharsetToUtf8(pItem->m_strPath);
-#endif
-            pItem->m_bIsFolder = true;
-            CUtil::AddSlashAtEnd(pItem->m_strPath);
-            FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
-            pItem->m_dateTime=localTime;
-
-            vecCacheItems.Add(pItem);
-#ifdef _LINUX
-            /* Checks if the file is hidden. If it is then we don't really need to add it */
-            if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) || g_guiSettings.GetBool("filelists.showhidden"))
-              items.Add(new CFileItem(*pItem));
-#else
-            items.Add(new CFileItem(*pItem));
-#endif
-          }
-        }
-        else
-        {
-          CStdString strLabel=wfd.cFileName;
-#ifndef _LINUX
-          g_charsetConverter.stringCharsetToUtf8(strLabel);
-#endif
-          CFileItem *pItem = new CFileItem(strLabel);
-          pItem->m_strPath = strRoot;
-          pItem->m_strPath += wfd.cFileName;
-#ifndef _LINUX
-          g_charsetConverter.stringCharsetToUtf8(pItem->m_strPath);
-#endif
-          pItem->m_bIsFolder = false;
-          pItem->m_dwSize = CUtil::ToInt64(wfd.nFileSizeHigh, wfd.nFileSizeLow);
-          FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
-          pItem->m_dateTime=localTime;
-#ifdef _LINUX
-          /* Checks if the file is hidden. If it is then we don't really need to add it */
-          if ((!(wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) || g_guiSettings.GetBool("filelists.showhidden")) && IsAllowed(wfd.cFileName))
-#else
-          if ( IsAllowed( wfd.cFileName) )
-#endif
-          {
-            vecCacheItems.Add(pItem);
-            items.Add(new CFileItem(*pItem));
-          }
-          else
-            vecCacheItems.Add(pItem);
-        }
       }
     }
-    while (FindNextFile((HANDLE)hFind, &wfd));
-#ifdef _XBOX
-    // if we use AutoPtrHandle, this auto-closes
-    FindClose((HANDLE)hFind); //should be closed
-#endif
   }
+  while (FindNextFile((HANDLE)hFind, &wfd));
+  
+#ifdef _XBOX
+  // if we use AutoPtrHandle, this auto-closes
+  FindClose((HANDLE)hFind); //should be closed
+#endif
+
   if (m_cacheDirectory)
     g_directoryCache.SetDirectory(strPath1, vecCacheItems);
   return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+CFileItem* CHDDirectory::BuildFileItem(const CStdString& strRoot, WIN32_FIND_DATA& wfd)
+{
+  CStdString strLabel = wfd.cFileName;
+#ifndef _LINUX
+  g_charsetConverter.stringCharsetToUtf8(strLabel);
+#endif
+
+  CFileItem *pItem = new CFileItem(strLabel);
+  pItem->m_strPath = strRoot;
+  pItem->m_strPath += wfd.cFileName;
+
+#ifndef _LINUX
+  g_charsetConverter.stringCharsetToUtf8(pItem->m_strPath);
+#endif
+  
+  if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+  {
+    pItem->m_bIsFolder = true;
+    CUtil::AddSlashAtEnd(pItem->m_strPath);
+  }
+  else
+  {
+    pItem->m_bIsFolder = false;
+    pItem->m_dwSize = CUtil::ToInt64(wfd.nFileSizeHigh, wfd.nFileSizeLow);
+  }
+  
+  return pItem;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+bool CHDDirectory::IsAllowed(CFileItem* pItem, WIN32_FIND_DATA& wfd)
+{
+  bool isAllowed = true;
+  
+#ifdef _LINUX
+  if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && g_guiSettings.GetBool("filelists.showhidden") == false)
+    isAllowed = false;
+#endif
+  
+  if (isAllowed == true)
+  {
+    if (pItem->m_bIsFolder)
+    {
+      CStdString strDir = wfd.cFileName;
+      if (strDir == "." || strDir == "..")
+        isAllowed = false;
+    }
+    else
+    {
+      // Make sure to use the resolved file.
+      CStdString strFile = CUtil::GetFileName(pItem->m_strPath);
+      if (IDirectory::IsAllowed(strFile) == false)
+        isAllowed = false;
+    }
+  }
+  
+  return isAllowed;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+CFileItem* CHDDirectory::BuildResolvedFileItem(const CStdString& strRoot, WIN32_FIND_DATA& wfd)
+{
+  CFileItem* pItem = 0;
+  
+#ifdef __APPLE__
+  // Attempt to resolve aliases.
+  FSRef   fsRef;
+  Boolean isDir;
+  Boolean isAlias;
+  char    resolvedAliasPath[MAX_PATH];
+  bool    useAlias = false;
+              
+  // Convert to FSRef.
+  CStdString strPath = strRoot;
+  CStdString strFile = strPath + wfd.cFileName;
+  if (FSPathMakeRef((const UInt8* )strFile.c_str(), &fsRef, &isDir) == noErr)
+  {
+    if (FSResolveAliasFileWithMountFlags(&fsRef, TRUE, &isDir, &isAlias, kResolveAliasFileNoUI) == noErr)
+    {
+      // If it was an alias, use the reference instead.
+      if (isAlias)
+      {
+        if (FSRefMakePath(&fsRef, (UInt8* )resolvedAliasPath, MAX_PATH) == noErr)
+          useAlias = true;
+      }
+    }
+    else
+    {
+      // Broken item.
+      return 0;
+    }
+  }
+  
+  // Compute the *final* name/path of the file.
+  if (useAlias)
+  {
+    strPath = resolvedAliasPath;
+    strFile = CUtil::GetFileName(strPath);
+    strPath = strPath.Left(strPath.length()-strFile.length());
+  }
+  else
+  {
+    strFile = wfd.cFileName;
+  }
+  
+  // Check for smart folders.
+  if (CUtil::IsSmartFolder(strFile))
+  {
+    // Use the original name, without extension.
+    CStdString smartFolder = wfd.cFileName;
+    int iPos = smartFolder.ReverseFind(".");
+    if (iPos > 0)
+      smartFolder = smartFolder.Left(iPos);
+    
+    pItem = new CFileItem(smartFolder);
+    pItem->m_strPath = "smartfolder:/" + strPath + strFile;
+    pItem->m_bIsFolder = true;
+  }
+  else if (useAlias)
+  {
+    // Add the alias.
+    pItem = new CFileItem(wfd.cFileName);
+    pItem->m_strPath = resolvedAliasPath;
+    pItem->m_bIsFolder = isDir ? true : false;
+    
+    if (isDir == false)
+    {
+      // Get the size of the file.
+      struct stat64 statInfo;
+      stat64(resolvedAliasPath, &statInfo);
+      pItem->m_dwSize = statInfo.st_size;
+    }
+  }
+  else
+#endif
+  {
+    // Go the default route.
+    pItem = BuildFileItem(strRoot, wfd);
+  }
+  
+  // Save file time.
+  FILETIME localTime;
+  FileTimeToLocalFileTime(&wfd.ftLastWriteTime, &localTime);
+  pItem->m_dateTime = localTime;
+  
+  return pItem;
 }
 
 bool CHDDirectory::Create(const char* strPath)
@@ -263,7 +313,7 @@ bool CHDDirectory::Remove(const char* strPath)
 
 bool CHDDirectory::Exists(const char* strPath)
 {
-  CStdString strReplaced=strPath;
+  CStdString strReplaced = strPath;
 #ifndef _LINUX
   g_charsetConverter.utf8ToStringCharset(strReplaced);
   strReplaced.Replace("/","\\");

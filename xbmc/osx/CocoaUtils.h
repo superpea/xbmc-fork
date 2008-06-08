@@ -65,6 +65,11 @@ extern "C"
   // Mouse.
   //
   void Cocoa_HideMouse();
+  
+  //
+  // Smart folders.
+  //
+  void Cocoa_GetSmartFolderResults(const char* strFile, void (*)(void* userData, void* userData2, const char* path), void* userData, void* userData2);
 
 #ifdef __cplusplus
 }

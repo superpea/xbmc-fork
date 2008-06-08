@@ -238,6 +238,9 @@ public:
   static bool IsSmb(const CStdString& strFile);
   static bool IsDAAP(const CStdString& strFile);
   static bool IsUPnP(const CStdString& strFile);
+#ifdef __APPLE__
+  static bool IsSmartFolder(const CStdString& strFile);
+#endif
   static void ConvertPathToUrl( const CStdString& strPath, const CStdString& strProtocol, CStdString& strOutUrl );
   static void GetDVDDriveIcon( const CStdString& strPath, CStdString& strIcon );
   static void RemoveTempFiles();

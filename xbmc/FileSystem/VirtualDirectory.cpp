@@ -130,6 +130,9 @@ bool CVirtualDirectory::GetDirectory(const CStdString& strPath, CFileItemList &i
       || strPath.Left(9).Equals("tuxbox://")
       || strPath.Left(7).Equals("upnp://")
       || strPath.Left(10).Equals("musicdb://")
+#ifdef __APPLE__
+      || strPath.Left(14).Equals("smartfolder://")
+#endif
       || strPath.Left(14).Equals("musicsearch://"))
     {
       // Only cache directory we are getting now

@@ -1896,6 +1896,15 @@ bool CUtil::IsUPnP(const CStdString& strFile)
     return strFile.Left(5).Equals("upnp:");
 }
 
+#ifdef __APPLE__
+bool CUtil::IsSmartFolder(const CStdString& strFile)
+{
+  CStdString strExtension;
+  CUtil::GetExtension(strFile,strExtension);
+  return (strExtension.Compare(".savedSearch") == 0); 
+}
+#endif
+
 bool CUtil::IsMemCard(const CStdString& strFile)
 {
   return strFile.Left(3).Equals("mem");
