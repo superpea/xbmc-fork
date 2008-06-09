@@ -44,7 +44,10 @@ void CSmartFolderDirectory::HandleSearchResult(void* thisPtr, void* itemListPtr,
 
   struct stat64 fileStat;
   if (stat64(strFilePath, &fileStat) != 0)
+  {
+    CLog::Log(LOGERROR, "Error: Smart Folder search, couldn't find file [%s]\n", strFilePath);
     return;
+  }
   
   if (S_ISDIR(fileStat.st_mode))
     wfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;

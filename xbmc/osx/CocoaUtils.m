@@ -419,7 +419,6 @@ void Cocoa_GetSmartFolderResults(const char* strFile, void (*CallbackFunc)(void*
   NSString*     raw = [doc objectForKey:@"RawQuery"];
 
   // Ugh, Carbon from now on...
-  printf("filePath: %x, doc: %x, raw: %x\n", filePath, doc, raw);
   MDQueryRef query = MDQueryCreate(kCFAllocatorDefault, (CFStringRef)raw, NULL, NULL);
   if (query)
   {
@@ -434,7 +433,7 @@ void Cocoa_GetSmartFolderResults(const char* strFile, void (*CallbackFunc)(void*
       MDItemRef resultItem = (MDItemRef)MDQueryGetResultAtIndex(query, i);
       CFStringRef titleRef = (CFStringRef)MDItemCopyAttribute(resultItem, kMDItemPath);
       
-      CFStringGetCString(titleRef, title, BUFSIZ, kCFStringEncodingMacRoman);
+      CFStringGetCString(titleRef, title, BUFSIZ, kCFStringEncodingUTF8);
       CallbackFunc(userData, userData2, title);
       CFRelease(titleRef);
     }  
