@@ -48,7 +48,7 @@
   FUNCTION(PyLong_AsLong)
   FUNCTION(PyLong_AsLongLong)
   FUNCTION(PyErr_Format)
-#if !defined(_LINUX) 
+#if !defined(_LINUX) || defined(__APPLE__)
   FUNCTION(PyUnicodeUCS2_AsUnicode)
 #else
   FUNCTION(PyUnicodeUCS4_AsUnicode)
