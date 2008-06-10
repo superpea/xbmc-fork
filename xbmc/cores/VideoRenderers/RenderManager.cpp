@@ -353,6 +353,14 @@ bool CXBoxRenderManager::SupportsGamma()
   return false;
 }
 
+int CXBoxRenderManager::GetMaxTextureSize()
+{
+  if (m_pRenderer)
+    return m_pRenderer->GetMaxTextureSize();
+  
+  return -1;
+}
+
 void CXBoxRenderManager::Present()
 {
 #ifdef HAS_SDL_OPENGL

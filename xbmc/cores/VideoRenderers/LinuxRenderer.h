@@ -138,6 +138,7 @@ public:
   virtual bool SupportsContrast() { return false; }
   virtual bool SupportsGamma() { return false; }
   virtual bool SupportsMultiPassRendering() { return false; }
+  virtual int  GetMaxTextureSize() { return -1; }
 
   void AutoCrop(bool bCrop);
   void RenderUpdate(bool clear, DWORD flags = 0, DWORD alpha = 255);

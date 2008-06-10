@@ -128,6 +128,7 @@ public:
   bool SupportsBrightness();
   bool SupportsContrast();
   bool SupportsGamma();
+  int GetMaxTextureSize();
 
 #ifdef HAS_SDL_OPENGL
   CLinuxRendererGL *m_pRenderer;

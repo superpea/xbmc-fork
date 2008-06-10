@@ -2467,6 +2467,13 @@ bool CLinuxRendererGL::SupportsMultiPassRendering()
   return glewIsSupported("GL_EXT_framebuffer_object") && glCreateProgram;
 }
 
+int CLinuxRendererGL::GetMaxTextureSize()
+{
+  GLint texSize; 
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+  return texSize;
+}
+
 #endif
 
 #endif

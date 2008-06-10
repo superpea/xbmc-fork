@@ -23,7 +23,6 @@
 #include "GUIFontTTF.h"
 #include "GUIFontManager.h"
 #include "GraphicContext.h"
-
 #include <math.h>
 
 // stuff for freetype
@@ -313,8 +312,16 @@ bool CGUIFontTTF::Load(const CStdString& strFilename, float height, float aspect
   m_textureWidth = ((m_cellHeight * CHARS_PER_TEXTURE_LINE) & ~63) + 64;
 #ifdef HAS_SDL_OPENGL
   m_textureWidth = PadPow2(m_textureWidth);
+  
+  GLint maxTextureSize; 
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+#else
+  int maxTextureSize = 2048;
 #endif
-  if (m_textureWidth > 4096) m_textureWidth = 4096;
+  
+  // Use a maximum texture width of 2048, which should work on all Macs. Ideally we should query the maximum texture width.
+  if (m_textureWidth > maxTextureSize) 
+    m_textureWidth = maxTextureSize;
 
   // set the posX and posY so that our texture will be created on first character write.
   m_posX = m_textureWidth;
