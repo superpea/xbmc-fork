@@ -1371,25 +1371,31 @@ void CGraphicContext::EndPaint(CSurface *dest, bool lock)
 bool CGraphicContext::ToggleFullScreenRoot ()
 {
   static RESOLUTION desktopres = DESKTOP;
-  static RESOLUTION windowres = WINDOW;
+  static RESOLUTION windowres = HDTV_480p_16x9;
   static RESOLUTION lastres = INVALID;
+  
   if (m_bFullScreenRoot)
   {
     lastres = GetVideoResolution();
     SetVideoResolution(windowres);
+    g_guiSettings.m_LookAndFeelResolution = windowres;
   }
   else
   {
     if (lastres != INVALID)
     {
       SetVideoResolution(lastres);
+      g_guiSettings.m_LookAndFeelResolution = lastres;
     }
     else
     {
       SetVideoResolution(desktopres);
+      g_guiSettings.m_LookAndFeelResolution = desktopres;
     }
   }
+
   g_fontManager.ReloadTTFFonts();
+  g_application.ReloadSkin();
   return  m_bFullScreenRoot;
 }
 
