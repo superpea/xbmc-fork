@@ -557,11 +557,14 @@ bool CFileItem::IsInternetStream() const
   if (strProtocol.size() == 0)
     return false;
 
+  if (IsOnLAN())
+    return false;
+  
   if (strProtocol == "shout" || strProtocol == "mms" ||
-      strProtocol == "http" || strProtocol == "ftp" ||
-      strProtocol == "rtsp" || strProtocol == "rtp" ||
-      strProtocol == "udp"  || strProtocol == "lastfm" ||
-      strProtocol == "https")
+      strProtocol == "http"  || strProtocol == "ftp" ||
+      strProtocol == "rtsp"  || strProtocol == "rtp" ||
+      strProtocol == "udp"   || strProtocol == "lastfm" ||
+      strProtocol == "https" || strProtocol == "xbms")
     return true;
 
   return false;
